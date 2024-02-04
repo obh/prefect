@@ -17,17 +17,22 @@ import requests
 @flow(log_prints=True)
 def get_cashfree_data():
     keys = fetch_keys(1848)
-    url = "https://sandbox.cashfree.com/pg/recon"
+    url = "https://api.cashfree.com/pg/recon"
     headers = {
         'x-client-id': keys[0],
-        'x-client-secret': keys[1]
+        'x-client-secret': keys[1],
+        'x-api-version': '2022-09-01'
     }
     payload = {
         "filters": {
             "start_date": "2023-07-20T00:00:00Z",
             "end_date": "2023-07-30T00:00:00Z"
+        },
+        "pagination": {
+            "limit": 10
         }
     }
+    print(url, headers, payload)
     response = requests.post(url, headers=headers, json=payload)
     print(response)
 
