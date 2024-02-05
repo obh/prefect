@@ -15,6 +15,10 @@ class Database(ABC):
     def add_client(self, client: models.CredEntry):
         pass
 
+    @abstractmethod
+    def get_client(self, client_id: str):
+        pass
+
 
 class MySqlDatabase(Database):
     def __init__(self):
@@ -36,8 +40,19 @@ class MySqlDatabase(Database):
         cursor = conn.cursor()
         cursor.execute('INSERT INTO clients (provider, client_id, credentials, status, added_on, updated_on) '
                        'VALUES (%s, %s, %s, %s, %s, %s)',
-                       (str(client.provider), client.client_id, json.dumps(client.credentials), str(client.status),
+                       (client.provider.value, client.client_id, json.dumps(client.credentials), client.status.value,
                         client.added_on, client.updated_on))
         conn.commit()
         conn.close()
+
+    def get_client(self, client_id: str):
+        conn = self.pool.apply(self.connect)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM clients where client_id = %s AND status = %s LIMIT 1',
+                       (client_id, models.Status.ACTIVE.value))
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        #TODO: convert this result to models.entity
+        return row
 

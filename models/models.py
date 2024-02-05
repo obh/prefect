@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Dict
+import json
 
 
 class Status(str, Enum):
@@ -33,6 +34,16 @@ class CredEntry:
     updated_on: datetime
 
 
+def credentry_from_row(row):
+    print(row)
+    return CredEntry(
+        provider=row['provider'],
+        client_id=row['client_id'],
+        credentials=json.loads(row['credentials']),
+        status=Status(row['status']),
+        added_on=row['added_on'],
+        updated_on=row['updated_on']
+    )
 
 
 

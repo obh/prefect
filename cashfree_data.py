@@ -1,7 +1,10 @@
+import time
+
 import httpx
 from prefect import flow
-from datetime import datetime
 import requests
+from datetime import datetime
+from models import models
 
 # @flow(log_prints=True)
 # def get_repo_info(repo_name: str = "PrefectHQ/prefect"):
@@ -14,9 +17,11 @@ import requests
 #     print(f"Forks 🍴 : {repo['forks_count']}")
 
 
-@flow(log_prints=True)
-def get_cashfree_data():
+@flow(flow_run_name="test-run")
+def get_data():
+    #print(cred, time)
     keys = fetch_keys(1848)
+    time.sleep(5)
     url = "https://api.cashfree.com/pg/recon"
     headers = {
         'x-client-id': keys[0],
@@ -43,5 +48,5 @@ def fetch_keys(merchantId: int):
 
 if __name__ == "__main__":
     # get_repo_info.serve(name="my-first-deployment")
-    get_cashfree_data.serve(name="my-second-deployment")
+    get_data.serve(name="my-second-deployment")
 

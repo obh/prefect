@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+
+import cashfree_data
 from db import db
 from flask_injector import FlaskInjector
 from models import models
@@ -35,6 +37,20 @@ def add_client(db_conn: db.Database) -> jsonify:
 @app.route('/providers', methods=['GET'])
 def get_providers() -> jsonify:
     return models.ProviderFields
+
+
+@app.route('/client/run', methods=['POST'])
+@inject
+def client_run(db_conn: db.Database) -> jsonify:
+    json = request.get_json()
+    client_id = json.get("client_id")
+    if not client_id:
+        return jsonify({'error': f'Missing fields: client_id'}), 400
+    result = db_conn.get_client(client_id=client_id)
+    credentry = models.credentry_from_row(result)
+    # cashfree_data.get_data(cred=credentry, time=datetime.now())
+    cashfree_data.get_data()
+    return jsonify({'data': result}), 200
 
 
 def configure(binder):
